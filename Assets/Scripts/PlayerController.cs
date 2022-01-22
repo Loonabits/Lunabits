@@ -16,6 +16,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private LayerMask ground;
 
+    public float jumpInterval = 1f;
+
     void Awake()
     {
         QualitySettings.vSyncCount = 0;
@@ -47,11 +49,13 @@ public class PlayerController : MonoBehaviour
         transform.position = currentPosition;
     }
 
+    private float lastJumpTime = 0;
     private void Jump()
     {
-        if (isGrounded()) 
+        if (isGrounded() && Time.time - lastJumpTime > jumpInterval) 
         {
             r2d.AddForce(new Vector2(0, jumpForce), ForceMode2D.Impulse);
+            lastJumpTime = Time.time;
         }
     }
 
