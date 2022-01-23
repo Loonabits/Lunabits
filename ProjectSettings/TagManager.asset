@@ -44,9 +44,9 @@ TagManager:
   - name: Tilemap
     uniqueID: 646197149
     locked: 0
-  - name: UI
+  - name: Player
     uniqueID: 53573909
     locked: 0
-  - name: Player
+  - name: UI
     uniqueID: 4001156047
     locked: 0
