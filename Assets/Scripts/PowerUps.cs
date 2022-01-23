@@ -19,7 +19,7 @@ public class PowerUps : MonoBehaviour
         childSprite = this.transform.GetChild(0);
         DOTween.Sequence()
         .Append(childSprite.transform.DOLocalMoveY(-0.1f, 1f))
-        .Append(childSprite.transform.DOLocalMoveY(0.1f, 1f))
+        .Append(childSprite.transform.DOLocalMoveY(0f, 1f))
         .SetLoops(int.MaxValue);
     }
 

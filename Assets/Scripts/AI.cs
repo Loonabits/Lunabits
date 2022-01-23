@@ -30,6 +30,10 @@ public class AI : MonoBehaviour
     public Aggresive rabbitType;
     private Aggresive currentRabbitType;
 
+    private int directionFollowed;
+    private int directionLength = -1;
+    private Vector3 idleDir = Vector2.left;
+
     void Awake()
     {
         ai = GetComponent<IAstarAI>();
@@ -65,28 +69,41 @@ public class AI : MonoBehaviour
                 Vector3 dir = goingRight ? Vector2.right : Vector2.left;
                 this.transform.Translate(dir * moveSpeed * Time.fixedDeltaTime);
             }
+        }
+        else
+        {
+            directionFollowed++;
 
-            if ((this.transform.position.x < lastPos.x + 0.1f && this.transform.position.x > lastPos.x - 0.1f) 
-            && (this.transform.position.y < lastPos.y + 0.1f && this.transform.position.y > lastPos.y - 0.1f) )
+            if (directionLength == -1)
             {
-                lengthStayed++;
+                directionLength = Random.Range(50, 250);
+                idleDir = Random.Range(0, 2) == 1 ? Vector2.left : Vector2.right;
             }
-            else
+            if (directionFollowed > directionLength)
             {
-                lengthStayed = 0;
-                lastPos = this.transform.position;
+                directionFollowed = 0;
+                directionLength = Random.Range(50, 250);
+                idleDir = Random.Range(0, 2) == 1 ? Vector2.left : Vector2.right;
             }
+            this.transform.Translate(idleDir * moveSpeed * Time.fixedDeltaTime);
+        }
 
-            if (lengthStayed > 50)
-            {
-                lengthStayed = 0;
-                lastPos = this.transform.position;
-                r2d.AddForce(new Vector2(Random.Range(0,2) == 1 ? -8 : 8, 5f), ForceMode2D.Impulse);
-            }
+        if ((this.transform.position.x < lastPos.x + 0.1f && this.transform.position.x > lastPos.x - 0.1f) 
+        && (this.transform.position.y < lastPos.y + 0.1f && this.transform.position.y > lastPos.y - 0.1f) )
+        {
+            lengthStayed++;
         }
         else
         {
             lengthStayed = 0;
+            lastPos = this.transform.position;
+        }
+
+        if (lengthStayed > 50)
+        {
+            lengthStayed = 0;
+            lastPos = this.transform.position;
+            r2d.AddForce(new Vector2(Random.Range(0,2) == 1 ? -8 : 8, 5f), ForceMode2D.Impulse);
         }
         
         
@@ -94,12 +111,16 @@ public class AI : MonoBehaviour
 
     public void Jump(bool jumpLeft, float jumpHeight, float jumpDistance, bool ignoreLevel = false)
     {
-        if (ignoreLevel)
+        if (rabbitType == Aggresive.Good && Random.Range(0, 2) == 1 && isGrounded())
+        {
+            r2d.AddForce(new Vector2(jumpLeft ? -jumpDistance : jumpDistance, jumpHeight), ForceMode2D.Impulse);
+        }
+        if (ignoreLevel && isGrounded())
         {
             r2d.AddForce(new Vector2(jumpLeft ? -jumpDistance : jumpDistance, jumpHeight), ForceMode2D.Impulse);
             return;
         }
-        if (!OnSameLevel()) 
+        if (!OnSameLevel() && isGrounded()) 
         {
             r2d.AddForce(new Vector2(jumpLeft ? -jumpDistance : jumpDistance, jumpHeight), ForceMode2D.Impulse);
         }
