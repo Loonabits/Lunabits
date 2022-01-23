@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class PlayerController : MonoBehaviour
 {
@@ -17,6 +18,8 @@ public class PlayerController : MonoBehaviour
     private LayerMask ground;
 
     public float jumpInterval = 1f;
+
+    public static event Action OnPlayerJump;
 
     void Awake()
     {
@@ -56,6 +59,7 @@ public class PlayerController : MonoBehaviour
         {
             r2d.AddForce(new Vector2(0, jumpForce), ForceMode2D.Impulse);
             lastJumpTime = Time.time;
+            OnPlayerJump?.Invoke();
         }
     }
 

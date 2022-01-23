@@ -42,6 +42,16 @@ public class AI : MonoBehaviour
         r2d = this.GetComponent<Rigidbody2D>();
     }
 
+    void OnEnable()
+    {
+        PlayerController.OnPlayerJump += OnPlayerJump;
+    }
+
+    void OnDisable()
+    {
+        PlayerController.OnPlayerJump -= OnPlayerJump;
+    }
+
 
     void FixedUpdate()
     {
@@ -89,7 +99,7 @@ public class AI : MonoBehaviour
         }
 
         if ((this.transform.position.x < lastPos.x + 0.1f && this.transform.position.x > lastPos.x - 0.1f) 
-        && (this.transform.position.y < lastPos.y + 0.1f && this.transform.position.y > lastPos.y - 0.1f) )
+        && (this.transform.position.y < lastPos.y + 0.1f && this.transform.position.y > lastPos.y - 0.1f) && moveSpeed > 0.5f)
         {
             lengthStayed++;
         }
@@ -103,7 +113,7 @@ public class AI : MonoBehaviour
         {
             lengthStayed = 0;
             lastPos = this.transform.position;
-            r2d.AddForce(new Vector2(Random.Range(0,2) == 1 ? -8 : 8, 5f), ForceMode2D.Impulse);
+            r2d.AddForce(new Vector2(Random.Range(0,2) == 1 ? -Random.Range(3, 10) : Random.Range(3, 10), 4f), ForceMode2D.Impulse);
         }
         
         
@@ -111,7 +121,7 @@ public class AI : MonoBehaviour
 
     public void Jump(bool jumpLeft, float jumpHeight, float jumpDistance, bool ignoreLevel = false)
     {
-        if (rabbitType == Aggresive.Good && Random.Range(0, 2) == 1 && isGrounded())
+        if (rabbitType == Aggresive.Good && Random.Range(0, 3) > 0 && isGrounded())
         {
             r2d.AddForce(new Vector2(jumpLeft ? -jumpDistance : jumpDistance, jumpHeight), ForceMode2D.Impulse);
         }
@@ -123,6 +133,14 @@ public class AI : MonoBehaviour
         if (!OnSameLevel() && isGrounded()) 
         {
             r2d.AddForce(new Vector2(jumpLeft ? -jumpDistance : jumpDistance, jumpHeight), ForceMode2D.Impulse);
+        }
+    }
+
+    public void Jump()
+    {
+        if (isGrounded()) 
+        {
+            r2d.AddForce(new Vector2(0, 10), ForceMode2D.Impulse);
         }
     }
 
@@ -146,5 +164,25 @@ public class AI : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    private void OnPlayerJump()
+    {
+        if (Random.Range(0, 2) == 1 && Vector2.Distance(this.transform.position, player.position) < 4 && rabbitType == Aggresive.Bad)
+        {
+            Jump();
+        }
+    }
+
+    public void PauseRabbit()
+    {
+        StartCoroutine(PauseRabbitCoroutine());
+    }
+
+    IEnumerator PauseRabbitCoroutine()
+    {
+        moveSpeed = 0;
+        yield return new WaitForSeconds(3f);
+        moveSpeed = 3f;
     }
 }
