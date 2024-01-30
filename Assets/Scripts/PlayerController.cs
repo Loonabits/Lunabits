@@ -19,8 +19,12 @@ public class PlayerController : MonoBehaviour
 
     public float jumpInterval = 1f;
 
+    public bool isJumping = false;
+
     public static event Action OnPlayerJump;
 
+    public Animator p_Anim;
+ 
     void Awake()
     {
         QualitySettings.vSyncCount = 0;
@@ -50,16 +54,27 @@ public class PlayerController : MonoBehaviour
         Vector3 currentPosition = transform.position;
         currentPosition.x += movementInput * speed * Time.deltaTime;
         transform.position = currentPosition;
+
+    }
+
+    void FixedUpdate()
+    {
+            if (isGrounded() && isJumping == true) {
+            isJumping = false;
+            p_Anim.SetBool("isJumping", false);
+        }
     }
 
     private float lastJumpTime = 0;
     private void Jump()
     {
-        if (isGrounded() && Time.time - lastJumpTime > jumpInterval) 
+        if (isGrounded() && (isJumping == false)) 
         {
             r2d.AddForce(new Vector2(0, jumpForce), ForceMode2D.Impulse);
             lastJumpTime = Time.time;
             OnPlayerJump?.Invoke();
+            p_Anim.SetBool("isJumping", true);
+            isJumping = true;
         }
     }
 
